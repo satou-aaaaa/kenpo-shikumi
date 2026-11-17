@@ -324,6 +324,22 @@ try {
     await q.context().close();
   }
 
+  // 終えた回（gone）がある側の保存に失敗し、別のタブが古い回を新しく保存しても、終えた回を戻さない（kenpo-shikumi PR #1 の CodeRabbit）
+  {
+    const ctx = await browser.newContext({ viewport: { width: 390, height: 800 } });
+    const g = await newPage(390, ctx);
+    const left = await g.evaluate(() => {
+      const r = { mode: "e", date: __nm.todayKey(), list: ["horitsu|1", "yosan|1"], res: [{ m: 0 }], cur: null, id: "gone1" };
+      const base = __nm.load();
+      const a = JSON.parse(JSON.stringify(base)); a.runs.e = null; a.gone = { gone1: 1 }; a.t = 100;
+      const b = JSON.parse(JSON.stringify(base)); b.runs.e = r; b.t = 200;
+      localStorage.setItem("kps-v1", JSON.stringify(b)); __nm.setMem(JSON.stringify(a));
+      try { return __nm.load().runs.e; } finally { __nm.setMem(null); }
+    });
+    check("終えた回は、別のタブが新しく保存した古い写しから戻さない", !left, JSON.stringify(left));
+    await ctx.close();
+  }
+
   // 古いタブ：同じ問題を2つのタブで開き、片方で答えたら、もう片方は二重に入れない
   {
     const ctx = await browser.newContext({ viewport: { width: 390, height: 800 } });

@@ -436,7 +436,7 @@ function load() {
   for (const m of new Set([...Object.keys(ra), ...Object.keys(rb)])) {
     const x = ra[m], y = rb[m];
     if (x === undefined || y === undefined) { if (x || y) s.runs[m] = x || y; continue; }
-    if (!x || !y) { const r = x || y; if (!r || (s.gone && s.gone[r.id]) || bank(s, r) || doneOf(r)) continue; const bd = bookOf(s, r.mode); if (!bd || !bd[r.date]) s.runs[m] = r; continue; }
+    if (!x || !y) { const r = x || y; if (!r || (s.gone && s.gone[r.id]) || bank(s, r) || doneOf(r)) { s.runs[m] = null; continue; } const bd = bookOf(s, r.mode); if (!bd || !bd[r.date]) s.runs[m] = r; continue; }
     if (x.id !== y.id && x.date !== y.date) { const [w, l] = x.date > y.date ? [x, y] : [y, x]; bank(s, l); s.runs[m] = w; }
     else if (x.id === y.id) { const px = prog(x), py = prog(y); s.runs[m] = px > py ? x : py > px ? y : n.runs[m]; }
   }
@@ -869,7 +869,7 @@ function about() {
   $("back").onclick = home; bindFooter(); toTop();
 }
 
-window.__nm = { randomTags, idsOf, mode: () => MODE, load, save, todayKey, dayNo, lateDays, ACH, achGot, nextAch, tally, shareText, streak, endlessList, moreList, ERAMP, TIPS, cur: () => cur, play: (m) => { if (m) MODE = m; play(); }, home, cal, book, about, EPOCH, KEY, G, start: startRun, setMore: (f) => { const o = moreHook; moreHook = f; return o; } };
+window.__nm = { setMem: (j) => { mem = j; }, randomTags, idsOf, mode: () => MODE, load, save, todayKey, dayNo, lateDays, ACH, achGot, nextAch, tally, shareText, streak, endlessList, moreList, ERAMP, TIPS, cur: () => cur, play: (m) => { if (m) MODE = m; play(); }, home, cal, book, about, EPOCH, KEY, G, start: startRun, setMore: (f) => { const o = moreHook; moreHook = f; return o; } };
 home();
 if ("serviceWorker" in navigator && location.protocol === "https:" && /github\.io$/.test(location.hostname)) navigator.serviceWorker.register("sw.js").catch(() => {});
 </script>
